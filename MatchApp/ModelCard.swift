@@ -12,25 +12,35 @@ class CardModel{
     
     func getCard() -> [Card]{
         
+        var generatedNumbersArray = [Int]()
+        
         //declare an empty array
         var generateCards = [Card]()
         
         //randomly generate 8 pairs of cards
-        for _ in 1...8{
+        while generatedNumbersArray.count < 8 {
             
             //generate random number
             let randomNumber = Int.random(in:1...13)
+           
+            //ensure that the random number isnt one we already have
             
-            //create two new card objects
-            let cardOne = Card()
-            let cardTwo = Card()
+            if generatedNumbersArray.contains(randomNumber) == false{
+                //store the number in the array
+                generatedNumbersArray.append(Int(randomNumber))
+                
+                //create two new card objects
+                let cardOne = Card()
+                let cardTwo = Card()
+                
+                //Set their image names
+                cardOne.imageName = "card\(randomNumber)"
+                cardTwo.imageName = "card\(randomNumber)"
+                
+                //add them to the array
+                generateCards += [cardOne,cardTwo]
+            }
             
-            //Set their image names
-            cardOne.imageName = "card\(randomNumber)"
-            cardTwo.imageName = "card\(randomNumber)"
-            
-            //add them to the array
-            generateCards += [cardOne,cardTwo]
         }
         
         //randomize the cards within the array

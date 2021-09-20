@@ -14,6 +14,7 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
     
     @IBOutlet weak var timerLabel: UILabel!
     
+    
     let model = CardModel()
     var cardsArray = [Card]()
     
@@ -21,6 +22,8 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
     var milliseconds:Int = 10 * 1000
     
     var firstFlippedCardIndex:IndexPath?
+   // var soundManager = SoundManager()
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,12 +34,16 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
         // Set the view controller as the datasource and delegate of the collection view
         collectionView.dataSource = self
         collectionView.delegate = self
+      
         
         // Initialize the timer
         timer = Timer.scheduledTimer(timeInterval: 0.001, target: self, selector: #selector(timerFired), userInfo: nil, repeats: true)
         RunLoop.main.add(timer!, forMode: .common)
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        SoundManager.playSound(.shuffle)
+    }
     // MARK: - Timer Methods
     
     @objc func timerFired() {
@@ -92,14 +99,29 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
+        //Check if there's any time left
+        if milliseconds <= 0{
+            return
+        }
+        
         // Get a reference to the cell that was tapped
         let cell = collectionView.cellForItem(at: indexPath) as? CardCollectionViewCell
         
+        //Get the card that user selected
+        let card = cardsArray[indexPath.row]
+        
         // Check the status of the card to determine how to flip it
-        if cell?.card?.isFlipped == false && cell?.card?.isMatched == false {
+       /////////////////////////////// if cell?.card?.isFlipped == false && cell?.card?.isMatched == false {
+        if card.isFlipped == false && card.isMatched == false{
             
             // Flip the card up
-            cell?.flipUp()
+            cell!.flipUp()
+            
+            //play flip sound
+            SoundManager.playSound(.flip)
+            
+            //set the status of the card
+            card.isFlipped = true
             
             // Check if this is the first card that was flipped or the second card
             if firstFlippedCardIndex == nil {
@@ -136,19 +158,26 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
             
             // It's a match
             
+            //play sound
+            SoundManager.playSound(.match)
             // Set the status and remove them
             cardOne.isMatched = true
             cardTwo.isMatched = true
             
             cardOneCell?.remove()
             cardTwoCell?.remove()
-            
+          
             // Was that the last pair?
             checkForGameEnd()
+           
+           
         }
         else {
             
             // It's not a match
+            
+            //play sound
+            SoundManager.playSound(.nomatch)
             
             cardOne.isFlipped = false
             cardTwo.isFlipped = false
@@ -157,7 +186,10 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
             cardOneCell?.flipDown()
             cardTwoCell?.flipDown()
         }
-        
+        //tell the collectionView to reload the cell of the first card if it is nil
+        if cardOneCell == nil{
+            collectionView.reloadItems(at: [firstFlippedCardIndex!])
+        }
         // Reset the firstFlippedCardIndex property
         firstFlippedCardIndex = nil
     }

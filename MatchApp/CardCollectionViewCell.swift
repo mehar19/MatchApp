@@ -23,9 +23,11 @@ class CardCollectionViewCell: UICollectionViewCell {
         frontCardView.image = UIImage(named: card.imageName)
         
         if card.isMatched == true{
+            //if the cards have been matched,mkae the imageviews invisible
             backCardView.alpha = 0
             frontCardView.alpha = 0
         }else{
+            //if the cards haven't been matched,make the imageviews visible
             backCardView.alpha = 1
             frontCardView.alpha = 1
         }
@@ -42,25 +44,25 @@ class CardCollectionViewCell: UICollectionViewCell {
     
     func flipUp(speed: TimeInterval = 0.3, delay: TimeInterval = 0.5){
         
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + delay){
-            UIView.transition(from: self.backCardView, to: self.frontCardView, duration: speed, options: [.showHideTransitionViews, .transitionFlipFromLeft], completion: nil)
-        }
+    //    DispatchQueue.main.asyncAfter(deadline: .now() + delay){
+            UIView.transition(from: self.backCardView, to: self.frontCardView, duration: speed, options: [ .transitionFlipFromLeft,.showHideTransitionViews], completion: nil)
+   //     }
         card?.isFlipped = true
    
     }
     
     func flipDown(speed: TimeInterval = 0.3, delay: TimeInterval = 0.5){
-        
-      
-        
+       
         card?.isFlipped = false
         
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + delay){
-            UIView.transition(from: self.frontCardView, to: self.backCardView, duration: speed, options: [.showHideTransitionViews, .transitionFlipFromLeft], completion: nil)
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay){
+            
+            UIView.transition(from: self.frontCardView, to: self.backCardView, duration: speed, options: [ .transitionFlipFromLeft, .showHideTransitionViews], completion: nil)
         }
     }
     
     func remove(){
+        //removes both images from being visible
         
         backCardView.alpha = 0
         
